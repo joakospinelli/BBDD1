@@ -108,3 +108,7 @@
 **Etiqueta** (<ins>#etiqueta</ins>, nombre)
 
 # 10. Hoteles
+
+*// Este está mal porque las cardinalidades máximas adentro de las agregaciones tienen que ser N, pero no se me ocurre cómo seguirlo así que lo dejo así* 💀
+
+<img src="./img/parte 2/ej10.png">
