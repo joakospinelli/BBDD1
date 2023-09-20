@@ -75,10 +75,6 @@
 
 # 9. Red Social
 
-*// Considerando que con la relación "sube" es suficiente para saber qué usuario cargó cada contenido*
-
-*// Leyendo el enunciado supuse que no se pueden subir contenidos sólos; siempre deberían estar en un álbum o en una publicación*
-
 <img src="./img/parte 2/ej9.png">
 
 **Usuario** (<ins>#usuario</ins>, username, nombre_completo, email)
@@ -109,6 +105,28 @@
 
 # 10. Hoteles
 
-*// Este está mal porque las cardinalidades máximas adentro de las agregaciones tienen que ser N, pero no se me ocurre cómo seguirlo así que lo dejo así* 💀
+<img src="./img/parte 2/ej10v2.png">
 
-<img src="./img/parte 2/ej10.png">
+**Hotel** (<ins>#hotel</ins>, nombre, estrellas, ubicación)
+
+**Tiene** (<ins>#hotel, #habitación</ins>)
+
+**Habitación** (<ins>#habitación</ins>, categoría, detalles, tipo)
+
+**Publica** (<ins>#hotel, #habitación, #sitio</ins>)
+
+**Sitio** (<ins>#sitio</ins>, nombre)
+
+**Encuentra** (<ins>#hotel, #habitación, #sitio</ins>)
+
+**Búsqueda** (<ins>#búsqueda</ins>, rango_fechas, cant_personas, precio)
+
+**Busca** (<ins>#búsqueda, #usuario</ins>)
+
+**Usuario** (<ins>#usuario</ins>, email, username, contraseña)
+
+# 11. Red de Farmacias
+
+<img src="./img/parte 2/ej11.png">
+
+No voy a hacer el relacional disculpen💀
