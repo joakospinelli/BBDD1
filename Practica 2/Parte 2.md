@@ -475,7 +475,7 @@ Se particiona L14 siguiendo las DFM 1 y 2:
 * L15: *(<ins>#medición, #parámetro, dominio_vehículo</ins>)*
 * L16: *(<ins>#medición, #instrumento, dominio_vehículo</ins>)*
 
-Se termino el proceso de normalización a 4fn con las siguientes particiones:
+Se terminó el proceso de normalización a 4FN con las siguientes particiones:
 * L1: *(<ins>#pozo</ins>, descripción_pozo, fecha_perforación)*
 * L3: *(<ins>#parámetro</ins>, nombre_parámetro, valor_ref)*
 * L5: *(<ins>dominio_vehículo</ins>, fecha_adquisición)*
@@ -487,3 +487,191 @@ Se termino el proceso de normalización a 4fn con las siguientes particiones:
 * L16: *(<ins>#medición, #instrumento, dominio_vehículo</ins>)*
 
 # 8.
+
+*FESTIVALES (#festival, denominacion_festival, localidad, cuil_musico, nombre_musico, fecha_nacimiento, #banda, nombre_banda, estilo_musical, #tema, nombre_tema, duracion, instrumento, cuil_auspiciante, url_plataforma_entradas, #locacion)*
+
+Donde:
+* Para cada festival se conoce su denominación y la localidad en la que se realiza. Más de un festival podría tener la misma denominación.
+* De cada banda se conoce su nombre y estilo musical.
+* De cada músico se conoce su nombre y su fecha de nacimiento. Tenga en cuenta que varios músicos podrían tener el mismo nombre.
+* Para cada tema interpretado por una banda en un festival se conoce su nombre y duración. Además, de cada músico que participó en el tema se sabe con qué instrumento lo hizo.
+* Los #tema pueden repetirse para las distintas bandas.
+* Un festival puede tener varios auspiciantes, y se vendieron entradas al mismo a través de varias plataformas.
+* Se tiene además un registro de todas las posibles locaciones donde se pueden realizar los festivales.
+
+DF:
+1. #festival -> denominación_festival, localidad, cuil_auspiciante, url_plataforma_entradas
+2. #banda -> nombre_banda, estilo_musical
+3. cuil_músico -> nombre_músico, fecha_nacimiento
+4. #tema, #banda, #festival -> nombre_tema, duración
+5. #tema, cuil_músico -> instrumento
+
+**Clave candidata:** *(#festival, #banda, #tema, cuil_músico)*
+
+## Iteración 1
+*Festivales* no está en BCFN, puesto que tiene DF no triviales o en las que `X` no es superclave del esquema.
+
+Particiono el esquema siguiendo la DF 2 `#banda -> nombre_banda, estilo_musical`:
+* L1: *(<ins>#banda</ins>, nombre_banda, estilo_musical)*
+* L2: *(<ins>#festival, #banda, #tema, cuil_músico</ins>, denominación_festival, localidad, nombre_músico, fecha_nacimiento, nombre_tema, duración, instrumento, cuil_auspiciante, url_plataforma_entradas, #locacion)*
+
+L1 ⋂ L2 = `#banda`, que es superclave de L1. Por lo tanto, no se perdió información.
+
+No se perdieron DF:
+1. #festival -> denominación_festival, localidad, cuil_auspiciante, url_plataforma_entradas
+2. #banda -> nombre_banda, estilo_musical
+3. cuil_músico -> nombre_músico, fecha_nacimiento
+4. #tema, #banda, #festival -> nombre_tema, duración
+5. #tema, cuil_músico -> instrumento
+
+* `L1`: 2
+* `L2`: 1, 3, 4, 5
+
+## Iteración 2
+* L1: *(<ins>#banda</ins>, nombre_banda, estilo_musical)*
+* L2: *(<ins>#festival, #banda, #tema, cuil_músico</ins>, denominación_festival, localidad, nombre_músico, fecha_nacimiento, nombre_tema, duración, instrumento, cuil_auspiciante, url_plataforma_entradas, #locacion)*
+
+L1 está en BCFN, puesto que en la DF 1, `#banda` es superclave del esquema.
+
+L2 no cumple con BCFN porque tiene DF no triviales o en las que `X` no es superclave del esquema.
+
+Particiono L2 siguiendo la DF 3 `cuil_músico -> nombre_músico, fecha_nacimiento`:
+* L3: *(<ins>cuil_músico</ins>, nombre_músico, fecha_nacimiento)*
+* L4: *(<ins>#festival, #banda, #tema, cuil_músico</ins>, denominación_festival, localidad, nombre_tema, duración, instrumento, cuil_auspiciante, url_plataforma_entradas, #locacion)*
+
+L3 ⋂ L4 = `cuil_músico`, que es superclave en L3. Por lo tanto, no se pierde información.
+
+No se perdieron DF:
+1. #festival -> denominación_festival, localidad, cuil_auspiciante, url_plataforma_entradas
+2. #banda -> nombre_banda, estilo_musical
+3. cuil_músico -> nombre_músico, fecha_nacimiento
+4. #tema, #banda, #festival -> nombre_tema, duración
+5. #tema, cuil_músico -> instrumento
+
+* `L1`: 2
+* `L3`: 3
+* `L4`: 1, 4, 5
+
+## Iteración 3
+* L1: *(<ins>#banda</ins>, nombre_banda, estilo_musical)*
+* L3: *(<ins>cuil_músico</ins>, nombre_músico, fecha_nacimiento)*
+* L4: *(<ins>#festival, #banda, #tema, cuil_músico</ins>, denominación_festival, localidad, nombre_tema, duración, instrumento, cuil_auspiciante, url_plataforma_entradas, #locacion)*
+
+L1 y L3 están en BCFN.
+
+L4 no cumple con BCFN, puesto que tiene DF no triviales o en las que `X` no es superclave del esquema.
+
+Particiono L4 siguiendo la DF 1 `#festival -> denominación_festival, localidad, cuil_auspiciente, url_plataforma_entradas`:
+* L5: *(<ins>#festival</ins>, denominación_festival, localidad, cuil_auspiciante, url_plataforma_entradas)*
+* L6: *(<ins>#festival, #banda, #tema, cuil_músico</ins>, nombre_tema, duración, instrumento, #locacion)*
+
+L5 ⋂ L6 = `#festival`, que es superclave en L5. Por lo tanto, no se pierde información.
+
+No se perdieron DF:
+1. #festival -> denominación_festival, localidad, cuil_auspiciante, url_plataforma_entradas
+2. #banda -> nombre_banda, estilo_musical
+3. cuil_músico -> nombre_músico, fecha_nacimiento
+4. #tema, #banda, #festival -> nombre_tema, duración
+5. #tema, cuil_músico -> instrumento
+
+* `L1`: 2
+* `L3`: 3
+* `L5`: 1
+* `L6`: 4, 5
+
+## Iteración 4
+* L1: *(<ins>#banda</ins>, nombre_banda, estilo_musical)*
+* L3: *(<ins>cuil_músico</ins>, nombre_músico, fecha_nacimiento)*
+* L5: *(<ins>#festival</ins>, denominación_festival, localidad, cuil_auspiciante, url_plataforma_entradas)*
+* L6: *(<ins>#festival, #banda, #tema, cuil_músico</ins>, nombre_tema, duración, instrumento, #locacion)*
+
+L1, L3 y L5 cumplen con BCFN.
+
+L6 no cumple con BCFN, puesto que tiene DF no triviales o en las que `X` no es superclave del esquema.
+
+Particiono L6 siguiendo la DF 4 `#tema, #banda, #festival -> nombre_tema, duración`:
+* L7: *(<ins>#tema, #banda, #festival</ins>, nombre_tema, duración)*
+* L8: *(<ins>#festival, #banda, #tema, cuil_músico</ins>, instrumento, #locacion)*
+
+L7 ⋂ L8 = `#tema, #banda, #festival`, que es superclave en L7. Por lo tanto, no se pierde información.
+
+No se perdieron DF:
+1. #festival -> denominación_festival, localidad, cuil_auspiciante, url_plataforma_entradas
+2. #banda -> nombre_banda, estilo_musical
+3. cuil_músico -> nombre_músico, fecha_nacimiento
+4. #tema, #banda, #festival -> nombre_tema, duración
+5. #tema, cuil_músico -> instrumento
+
+* `L1`: 2
+* `L3`: 3
+* `L5`: 1
+* `L7`: 4
+* `L8`: 5
+
+## Iteración 5
+* L1: *(<ins>#banda</ins>, nombre_banda, estilo_musical)*
+* L3: *(<ins>cuil_músico</ins>, nombre_músico, fecha_nacimiento)*
+* L5: *(<ins>#festival</ins>, denominación_festival, localidad, cuil_auspiciante, url_plataforma_entradas)*
+* L7: *(<ins>#tema, #banda, #festival</ins>, nombre_tema, duración)*
+* L8: *(<ins>#festival, #banda, #tema, cuil_músico</ins>, instrumento, #locacion)*
+
+L1, L3, L5 y L7 están en BCFN.
+
+L8 no cumple con BCFN, puesto que tiene la DF 5, la cual es no trivial y `#tema, cuil_músico` no es superclave.
+
+Particiono L8 siguiendo la DF 5 `#tema, cuil_músico -> instrumento`:
+* L9: *(<ins>#tema, cuil_músico</ins>, instrumento)*
+* L10: *(<ins>#festival, #banda, #tema, cuil_músico</ins>, #locacion)*
+
+L9 ⋂ L10 = `#tema, cuil_músico`, que es superclave en L9. Por lo tanto, no se pierde información.
+
+No se perdieron DF:
+1. #festival -> denominación_festival, localidad, cuil_auspiciante, url_plataforma_entradas
+2. #banda -> nombre_banda, estilo_musical
+3. cuil_músico -> nombre_músico, fecha_nacimiento
+4. #tema, #banda, #festival -> nombre_tema, duración
+5. #tema, cuil_músico -> instrumento
+
+* `L1`: 2
+* `L3`: 3
+* `L5`: 1
+* `L7`: 4
+* `L9`: 5
+
+## Normalización a BCFN
+* L1: *(<ins>#banda</ins>, nombre_banda, estilo_musical)*
+* L3: *(<ins>cuil_músico</ins>, nombre_músico, fecha_nacimiento)*
+* L5: *(<ins>#festival</ins>, denominación_festival, localidad, cuil_auspiciante, url_plataforma_entradas)*
+* L7: *(<ins>#tema, #banda, #festival</ins>, nombre_tema, duración)*
+* L9: *(<ins>#tema, cuil_músico</ins>, instrumento)*
+* L10: *(<ins>#festival, #banda, #tema, cuil_músico</ins>, #locacion)*
+
+L1, L3, L5, L7 y L9 están en BCFN.
+
+L10 está en BCFN, puesto que sólo tiene DF triviales.
+
+*// qué pasa con `#locación` ???*
+
+## Normalización a 4FN
+Se encontraron las siguientes DF multivaluadas:
+1.  #festival >> cuil_auspiciante
+2.  #festival >> url_plataforma_entradas
+3.  ⊘ >> #locacion
+
+Por lo tanto, el esquema no está en 4FN.
+
+Se particiona L5 siguiendo las DFM 1 y 2:
+* L11: *(<ins>#festival</ins>, denominación_festival, localidad, cuil_auspiciante)*
+* L12: *(<ins>#festival</ins>, denominación_festival, localidad, url_plataforma_entradas)*
+
+Por último, se produce un esquema nuevo para resolver la DFM 3:
+* L13: *(<ins>#locación</ins>)*
+
+Se terminó el proceso de normalización a 4FN con las siguientes particiones:
+* L1: *(<ins>#banda</ins>, nombre_banda, estilo_musical)*
+* L3: *(<ins>cuil_músico</ins>, nombre_músico, fecha_nacimiento)*
+* L7: *(<ins>#tema, #banda, #festival</ins>, nombre_tema, duración)*
+* L9: *(<ins>#tema, cuil_músico</ins>, instrumento)*
+* L11: *(<ins>#festival</ins>, denominación_festival, localidad, cuil_auspiciante)*
+* L12: *(<ins>#festival</ins>, denominación_festival, localidad, url_plataforma_entradas)*
+* L13: *(<ins>#locación</ins>)*
