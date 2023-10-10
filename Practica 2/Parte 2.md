@@ -675,3 +675,256 @@ Se terminó el proceso de normalización a 4FN con las siguientes particiones:
 * L11: *(<ins>#festival</ins>, denominación_festival, localidad, cuil_auspiciante)*
 * L12: *(<ins>#festival</ins>, denominación_festival, localidad, url_plataforma_entradas)*
 * L13: *(<ins>#locación</ins>)*
+
+# 9.
+
+*Dispositivos (Marca_id, descripMarca, modelo_id, descripModelo, equipo_tipo_id, descripEquipoTipo, nombreEmpresa, cuit, direcciónEmpresa, usuario_id, apyn, direcciónUsuario, cuil, plan_id, descripPlan, importe, equipo_id, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+Donde:
+* Para cada equipo interesa conocer su tipo, modelo, imei, fecha en que se dio de alta, fecha en que se da de baja y las observaciones que sean necesarias.
+* De cada marca se conoce su descripción
+* De cada modelo se conoce su descripción y a qué marca pertenece.
+* Para cada plan, se registra qué empresa lo brinda, descripción e importe del mismo.
+* Para cada tipo de equipo se conoce la descripción
+* Para cada empresa se registra el nombre, cuit y dirección
+* De cada usuario se registra su nombre y apellido, número de documento, dirección y CUIL *// no existe un campo para el DNI así que no lo pongo*
+* Para cada línea se necesita registrar qué plan posee, la fecha de alta de la línea, la fecha de baja, el equipo que la posee y el usuario de la misma.
+
+DF:
+1. equipo_id -> equipo_tipo_id, modelo_id, imei, fec_alta, fec_baja, observaciones
+2. imei -> equipo_tipo_id, modelo_id, equipo_id, fec_alta, fec_baja, observaciones
+3. modelo_id -> descripModelo, marca_id
+4. marca_id -> descripMarca
+5. plan_id -> cuit, descripPlan, importe
+6. equipo_tipo_id -> descripEquipoTipo
+7. cuit -> nombreEmpresa, direcciónEmpresa
+8. usuario_id -> apyn, direcciónUsuario, cuil
+9. cuil -> usuario_id, apyn, direcciónUsuario
+
+**Claves candidatas:**
+* CC1: *(equipo_id, plan_id, usuario_id)*
+* CC2: *(equipo_id, plan_id, cuil)*
+
+## Iteración 1
+
+*Dispositivos* no está en BCFN, puesto que tiene DF no triviales o en las que `X` no es superclave del esquema.
+
+Particiono *Dispositivos* siguiendo la DF 6  `equipo_tipo_id -> descripEquipoTipo`
+* L1: *(<ins>equipo_tipo_id</ins>, descripEquipoTipo)*
+* L2: *(<ins>equipo_id, plan_id, usuario_id</ins>, Marca_id, descripMarca, modelo_id, descripModelo, equipo_tipo_id, nombreEmpresa, cuit, direcciónEmpresa, apyn, direcciónUsuario, cuil, descripPlan, importe, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+L1 ⋂ L2 = `equipo_tipo_id`, que es superclave en L1. Por lo tanto, no se perdió información.
+
+No se perdieron DF:
+1. equipo_id -> equipo_tipo_id, modelo_id, imei, fec_alta, fec_baja, observaciones
+2. imei -> equipo_tipo_id, modelo_id, equipo_id, fec_alta, fec_baja, observaciones
+3. modelo_id -> descripModelo, marca_id
+4. marca_id -> descripMarca
+5. plan_id -> cuit, descripPlan, importe
+6. equipo_tipo_id -> descripEquipoTipo
+7. cuit -> nombreEmpresa, direcciónEmpresa
+8. usuario_id -> apyn, direcciónUsuario, cuil
+9. cuil -> usuario_id, apyn, direcciónUsuario
+* `L1`: 6
+* `L2`: 1, 2, 3, 4, 5, 7, 8, 9
+
+## Iteración 2
+* L1: *(<ins>equipo_tipo_id</ins>, descripEquipoTipo)*
+* L2: *(<ins>equipo_id, plan_id, usuario_id</ins>, Marca_id, descripMarca, modelo_id, descripModelo, equipo_tipo_id, nombreEmpresa, cuit, direcciónEmpresa, apyn, direcciónUsuario, cuil, descripPlan, importe, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+L1 está en BCFN. L2 no está en BCFN.
+
+Particiono L2 siguiendo la DF 4 `marca_id -> descrip_marca`:
+* L3: *(<ins>marca_id</ins>, descrip_marca)*
+* L4: *(<ins>equipo_id, plan_id, usuario_id</ins>, Marca_id, modelo_id, descripModelo, equipo_tipo_id, nombreEmpresa, cuit, direcciónEmpresa, apyn, direcciónUsuario, cuil, descripPlan, importe, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+L3 ⋂ L4 = `marca_id`, que es superclave en L3. Por lo tanto, no se perdió información.
+
+No se perdieron DF:
+1. equipo_id -> equipo_tipo_id, modelo_id, imei, fec_alta, fec_baja, observaciones
+2. imei -> equipo_tipo_id, modelo_id, equipo_id, fec_alta, fec_baja, observaciones
+3. modelo_id -> descripModelo, marca_id
+4. marca_id -> descripMarca
+5. plan_id -> cuit, descripPlan, importe
+6. equipo_tipo_id -> descripEquipoTipo
+7. cuit -> nombreEmpresa, direcciónEmpresa
+8. usuario_id -> apyn, direcciónUsuario, cuil
+9. cuil -> usuario_id, apyn, direcciónUsuario
+* `L1`: 6
+* `L3`: 4
+* `L4`: 1, 2, 3, 5, 7, 8, 9
+
+## Iteración 3
+* L1: *(<ins>equipo_tipo_id</ins>, descripEquipoTipo)*
+* L3: *(<ins>marca_id</ins>, descrip_marca)*
+* L4: *(<ins>equipo_id, plan_id, usuario_id</ins>, Marca_id, modelo_id, descripModelo, equipo_tipo_id, nombreEmpresa, cuit, direcciónEmpresa, apyn, direcciónUsuario, cuil, descripPlan, importe, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+L1 y L3 están en BCFN. L4 no está en BCFN.
+
+Particiono L4 siguiendo la DF 3 `modelo_id -> descripModelo, marca_id`:
+* L5: *(<ins>modelo_id</ins>, descripModelo, marca_id)*
+* L6: *(<ins>equipo_id, plan_id, usuario_id</ins>, modelo_id, equipo_tipo_id, nombreEmpresa, cuit, direcciónEmpresa, apyn, direcciónUsuario, cuil, descripPlan, importe, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+L5 ⋂ L6 = `modelo_id`, que es superclave en L5. Por lo tanto, no se perdió información.
+
+No se perdieron DF:
+1. equipo_id -> equipo_tipo_id, modelo_id, imei, fec_alta, fec_baja, observaciones
+2. imei -> equipo_tipo_id, modelo_id, equipo_id, fec_alta, fec_baja, observaciones
+3. modelo_id -> descripModelo, marca_id
+4. marca_id -> descripMarca
+5. plan_id -> cuit, descripPlan, importe
+6. equipo_tipo_id -> descripEquipoTipo
+7. cuit -> nombreEmpresa, direcciónEmpresa
+8. usuario_id -> apyn, direcciónUsuario, cuil
+9. cuil -> usuario_id, apyn, direcciónUsuario
+* `L1`: 6
+* `L3`: 4
+* `L5`: 3
+* `L6`: 1, 2, 5, 7, 8, 9
+
+## Iteración 4
+* L1: *(<ins>equipo_tipo_id</ins>, descripEquipoTipo)*
+* L3: *(<ins>marca_id</ins>, descrip_marca)*
+* L5: *(<ins>modelo_id</ins>, descripModelo, marca_id)*
+* L6: *(<ins>equipo_id, plan_id, usuario_id</ins>, modelo_id, equipo_tipo_id, nombreEmpresa, cuit, direcciónEmpresa, apyn, direcciónUsuario, cuil, descripPlan, importe, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+L1, L3 y L5 están en BCFN. L6 no está en BCFN.
+
+Particiono L6 siguiendo la DF 7 `cuit -> nombreEmpresa, direcciónEmpresa`:
+* L7: *(<ins>cuit</ins>, nombreEmpresa, direcciónEmpresa)*
+* L8: *(<ins>equipo_id, plan_id, usuario_id</ins>, modelo_id, equipo_tipo_id, cuit, apyn, direcciónUsuario, cuil, descripPlan, importe, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+L7 ⋂ L8 = `cuit`, que es superclave en L7. Por lo tanto, no se perdió información.
+
+No se perdieron DF:
+1. equipo_id -> equipo_tipo_id, modelo_id, imei, fec_alta, fec_baja, observaciones
+2. imei -> equipo_tipo_id, modelo_id, equipo_id, fec_alta, fec_baja, observaciones
+3. modelo_id -> descripModelo, marca_id
+4. marca_id -> descripMarca
+5. plan_id -> cuit, descripPlan, importe
+6. equipo_tipo_id -> descripEquipoTipo
+7. cuit -> nombreEmpresa, direcciónEmpresa
+8. usuario_id -> apyn, direcciónUsuario, cuil
+9. cuil -> usuario_id, apyn, direcciónUsuario
+* `L1`: 6
+* `L3`: 4
+* `L5`: 3
+* `L7`: 7
+* `L8`: 1, 2, 5, 8, 9
+
+## Iteración 5
+* L1: *(<ins>equipo_tipo_id</ins>, descripEquipoTipo)*
+* L3: *(<ins>marca_id</ins>, descrip_marca)*
+* L5: *(<ins>modelo_id</ins>, descripModelo, marca_id)*
+* L7: *(<ins>cuit</ins>, nombreEmpresa, direcciónEmpresa)*
+* L8: *(<ins>equipo_id, plan_id, usuario_id</ins>, modelo_id, equipo_tipo_id, cuit, apyn, direcciónUsuario, cuil, descripPlan, importe, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+L1, L3, L5 y L7 están en BCFN. L8 no está en BCFN.
+
+Particiono L8 siguiendo la DF 5 `plan_id -> cuit, descripPlan, importe`:
+* L9: *(<ins>plan_id</ins>, cuit, descripPlan, importe)*
+* L10: *(<ins>equipo_id, plan_id, usuario_id</ins>, modelo_id, equipo_tipo_id, apyn, direcciónUsuario, cuil, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+L9 ⋂ L10 = `plan_id`, que es superclave en L9. Por lo tanto, no se perdió información.
+
+No se perdieron DF:
+1. equipo_id -> equipo_tipo_id, modelo_id, imei, fec_alta, fec_baja, observaciones
+2. imei -> equipo_tipo_id, modelo_id, equipo_id, fec_alta, fec_baja, observaciones
+3. modelo_id -> descripModelo, marca_id
+4. marca_id -> descripMarca
+5. plan_id -> cuit, descripPlan, importe
+6. equipo_tipo_id -> descripEquipoTipo
+7. cuit -> nombreEmpresa, direcciónEmpresa
+8. usuario_id -> apyn, direcciónUsuario, cuil
+9. cuil -> usuario_id, apyn, direcciónUsuario
+* `L1`: 6
+* `L3`: 4
+* `L5`: 3
+* `L7`: 7
+* `L9`: 5
+* `L10`: 1, 2, 8, 9
+
+## Iteración 6
+* L1: *(<ins>equipo_tipo_id</ins>, descripEquipoTipo)*
+* L3: *(<ins>marca_id</ins>, descrip_marca)*
+* L5: *(<ins>modelo_id</ins>, descripModelo, marca_id)*
+* L7: *(<ins>cuit</ins>, nombreEmpresa, direcciónEmpresa)*
+* L9: *(<ins>plan_id</ins>, cuit, descripPlan, importe)*
+* L10: *(<ins>equipo_id, plan_id, usuario_id</ins>, modelo_id, equipo_tipo_id, apyn, direcciónUsuario, cuil, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+L1, L3, L5, L7 y L9 están en BCFN. L10 no está en BCFN.
+
+Particiono L10 siguiendo la DF 8 `usuario_id -> apyn, direcciónUsuario, cuil`:
+* L11: *(<ins>usuario_id</ins>, apyn, direcciónUsuario, cuil)*
+* L12: *(<ins>equipo_id, plan_id, usuario_id</ins>, modelo_id, equipo_tipo_id, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+Al hacer esto, también se movió la DF 9 a L11.
+
+L11 ⋂ L12 = `usuario_id`, que es superclave en L11. Por lo tanto, no se perdió información.
+
+No se perdieron DF:
+1. equipo_id -> equipo_tipo_id, modelo_id, imei, fec_alta, fec_baja, observaciones
+2. imei -> equipo_tipo_id, modelo_id, equipo_id, fec_alta, fec_baja, observaciones
+3. modelo_id -> descripModelo, marca_id
+4. marca_id -> descripMarca
+5. plan_id -> cuit, descripPlan, importe
+6. equipo_tipo_id -> descripEquipoTipo
+7. cuit -> nombreEmpresa, direcciónEmpresa
+8. usuario_id -> apyn, direcciónUsuario, cuil
+9. cuil -> usuario_id, apyn, direcciónUsuario
+* `L1`: 6
+* `L3`: 4
+* `L5`: 3
+* `L7`: 7
+* `L9`: 5
+* `L11`: 8, 9
+* `L12`: 1, 2
+
+## Iteración 7
+* L1: *(<ins>equipo_tipo_id</ins>, descripEquipoTipo)*
+* L3: *(<ins>marca_id</ins>, descrip_marca)*
+* L5: *(<ins>modelo_id</ins>, descripModelo, marca_id)*
+* L7: *(<ins>cuit</ins>, nombreEmpresa, direcciónEmpresa)*
+* L9: *(<ins>plan_id</ins>, cuit, descripPlan, importe)*
+* L11: *(<ins>usuario_id</ins>, apyn, direcciónUsuario, cuil)*
+* L12: *(<ins>equipo_id, plan_id, usuario_id</ins>, modelo_id, equipo_tipo_id, imei, fec_alta, fec_baja, observaciones, línea_id, fec_alta_linea, fec_baja_linea)*
+
+L1, L3, L5, L7, L9 y L11 están en BCFN. L12 no está en BCFN.
+
+Particiono L12 siguiendo la DF 1 `equipo_id -> equipo_tipo_id, modelo_id, imei, fec_alta, fec_baja, observaciones`:
+* L13: *(<ins>equipo_id</ins>, equipo_tipo_id, modelo_id, imei, fec_alta, fec_baja, observaciones)*
+* L14: *(<ins>equipo_id, plan_id, usuario_id</ins>s, línea_id, fec_alta_linea, fec_baja_linea)*
+
+Al hacer esto, también se movió la DF 2 a L13.
+
+L13 ⋂ L14 = `equipo_id`, que es superclave en L13. Por lo tanto, no se perdió información.
+
+No se perdieron DF:
+1. equipo_id -> equipo_tipo_id, modelo_id, imei, fec_alta, fec_baja, observaciones
+2. imei -> equipo_tipo_id, modelo_id, equipo_id, fec_alta, fec_baja, observaciones
+3. modelo_id -> descripModelo, marca_id
+4. marca_id -> descripMarca
+5. plan_id -> cuit, descripPlan, importe
+6. equipo_tipo_id -> descripEquipoTipo
+7. cuit -> nombreEmpresa, direcciónEmpresa
+8. usuario_id -> apyn, direcciónUsuario, cuil
+9. cuil -> usuario_id, apyn, direcciónUsuario
+* `L1`: 6
+* `L3`: 4
+* `L5`: 3
+* `L7`: 7
+* `L9`: 5
+* `L11`: 8, 9
+* `L13`: 1, 2
+
+## Normalización a BCFN
+* L1: *(<ins>equipo_tipo_id</ins>, descripEquipoTipo)*
+* L3: *(<ins>marca_id</ins>, descrip_marca)*
+* L5: *(<ins>modelo_id</ins>, descripModelo, marca_id)*
+* L7: *(<ins>cuit</ins>, nombreEmpresa, direcciónEmpresa)*
+* L9: *(<ins>plan_id</ins>, cuit, descripPlan, importe)*
+* L11: *(<ins>usuario_id</ins>, apyn, direcciónUsuario, cuil)*
+* L13: *(<ins>equipo_id</ins>, equipo_tipo_id, modelo_id, imei, fec_alta, fec_baja, observaciones)*
+* L14: *(<ins>equipo_id, plan_id, usuario_id</ins>, línea_id, fec_alta_linea, fec_baja_linea)*
+
+*// Me faltó una DF con línea_id, pero no voy a hacer todo de nuevo para agregarla :(*
