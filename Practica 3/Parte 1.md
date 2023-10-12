@@ -96,9 +96,8 @@ PASAJEROS_PISTARINI <— π <sub>nombre,dni</sub> (RESERVA_PISTARINI |X| PASAJER
 
 1. `VUELOS_PISTARINI` obtiene los vuelos que su aeropuerto de salida sea "*Ministro Pistarini"* y proyecta sólo los números de los vuelso.
 2. `RESERVA_PISTARINI` realiza un producto natural para obtener las reservas a vuelos con dicho aeropuerto de salida, y proyecta los números de pasajeros.
-3. `PASAJEROS_PISTARINI` realiza un producto natural para obtener los pasajeros que realizaron dichas reservas, y luego proyecta el nombre y DNI de cada uno.
 
-✅ La consulta es correcta.
+❌ La consulta es incorrecta. En la consulta `RESERVA_PISTARINI` intenta proyecta el número de pasajero, pero ese atributo no se encuentra en el esquema resultante del producto natural.
 
 ## e. Obtener los ID de los pasajeros que hayan realizado reservas por un monto superior a $99000
 
