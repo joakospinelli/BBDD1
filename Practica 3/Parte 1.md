@@ -4,7 +4,7 @@
 * `A(a,b,c) U B(a,b,d)`: ❌ A y B no son unión-compatibles puesto que los atributos `c` y `d` no pertenecen al mismo dominio.
 * `(A(a,b,c) |X| B(a,b)) - C(a,b,c)`: ✅ El producto natural entre A y B genera una relación `(a,b,c)`, que es unión-compatible con C.
 * `(A(a,b,c) |X| B(a,d,e)) ∩ D(a,b,c,d,e)` ✅ El producto natural entre A y B genera una relación `(a,b,c,d,e)`, que es unión compatible con D.
-* `(A(a,b,c) X B (a,b,d)) ∩ D(a,b,c,d)`: ✅ El producto natural entre A y B genera una relación `(a,b,c,d,e)`, que es unión-compatible con D.
+* `(A(a,b,c) X B (a,b,d)) ∩ D(a,b,c,d)`: ❌ El producto cartesiano no elimina atributos con nombre duplicados, por lo que genera una relación que no es unión compatible con D.
 
 ## b. Para la operación de resta es necesario que los esquemas involucrados sean compatibles, es decir, deben cumplir las siguientes condiciones:
 * Deben tener la misma cantidad de columnas ✅
