@@ -257,3 +257,42 @@ END;
 ```sql
 CALL agregarReparacion(1009443, 100, '2013-12-14 12:20:31', 4, '4243-4255', TRUE, 'Maidana', 'bomba de combustible');
 ```
+
+# 11. Considerando la siguiente consulta analice su plan de ejecución mediante el uso de la sentencia EXPLAIN.
+```sql
+EXPLAIN (
+	select count(r.dniCliente) from reparacion r, cliente c, sucursal s, revisionreparacion rv
+    where r.dnicliente=c.dnicliente
+		and r.codsucursal=s.codsucursal
+		and r.dnicliente=rv.dnicliente
+        and r.fechainicioreparacion=rv.fechainicioreparacion
+        and empleadoreparacion = 'Maidana'
+        and s.m2<200
+        and s.ciudadsucursal='La Plata');
+```
+<img src="./img/ej11.1.png">
+
+## a ¿Qué atributos del plan de ejecución encuentra relevantes para evaluar la performance de la consulta?
+* `type`: tipo de acceso realizado sobre las filas. Hay algunos más eficientes que otros.
+* `key`: índice seleccionado para realizar la operación. La elección correcta de un índice indica una mejor performance.
+* `rows`: cantidad de filas sobre las que opera la consulta. Cuantas más filas haya, más lenta será.
+* `filtered`: indica el porcentaje de filas que se espera que se filtren. Cuanto mayor sea el porcentaje, se considera que la consulta es más eficiente.
+
+## b. Observe en particular el atributo type ¿cómo se están aplicando los `JOIN` entre las tablas involucradas?
+
+El tipo `all` indica que las tablas se escanean por completo.
+
+El tipo `eq_ref` indica que se está usando un índice que coincide entre ambas tablas para unirlas.
+
+Comparando ambos tipos, `eq_ref` realiza el JOIN de manera más eficiente puesto que no evalúa las tablas completas.
+
+## c. Según lo que observó en los puntos anteriores, ¿qué mejoras se pueden realizar para optimizar la consulta?
+
+Se pueden agregar índices en las tablas `s` y `r`, que son las que se unen con el tipo `all`. De esta manera va a hacer un escaneo más eficiente.
+
+## d. Aplique las mejoras propuestas y vuelva a analizar el plan de ejecución. ¿Qué cambios observa?
+```sql
+CREATE INDEX s_index ON sucursal(ciudadSucursal);
+CREATE INDEX r2_index ON reparacion(codSucursal);
+```
+<img src="./img/ej11.2.png">
