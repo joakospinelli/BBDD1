@@ -270,7 +270,7 @@ EXPLAIN (
         and s.m2<200
         and s.ciudadsucursal='La Plata');
 ```
-<img src="./img/ej11.1.png">
+<img src="./img/parte2/ej11.1.png">
 
 ## a ¿Qué atributos del plan de ejecución encuentra relevantes para evaluar la performance de la consulta?
 * `type`: tipo de acceso realizado sobre las filas. Hay algunos más eficientes que otros.
@@ -295,4 +295,4 @@ Se pueden agregar índices en las tablas `s` y `r`, que son las que se unen con 
 CREATE INDEX s_index ON sucursal(ciudadSucursal);
 CREATE INDEX r2_index ON reparacion(codSucursal);
 ```
-<img src="./img/ej11.2.png">
+<img src="./img/parte2/ej11.2.png">
