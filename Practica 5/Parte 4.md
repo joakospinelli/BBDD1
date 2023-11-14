@@ -25,7 +25,7 @@ Crea dicha vista donde se liste el id, nombre y stock disponible de los producto
 
 ```sql
 CREATE VIEW app_deposito AS
-    SELECT p.id_producto, p.nombre, COUNT(p.stock) AS stock_actual, COUNT(rd.cantidad_productos_max) AS stock_maximo
+    SELECT p.id_producto, p.nombre, p.stock AS stock_actual, SUM(rd.cantidad_productos_max) AS stock_maximo
     FROM PRODUCTOS p, RACK_DEPOSITO rd
     GROUP BY p.id_producto;
 ```
@@ -55,6 +55,8 @@ BEGIN
 
     START TRANSACTION
     
+        OPEN recorrer;
+
         agregar: LOOP
             FETCH NEXT FROM recorrer INTO id_act, nombre_act, stock_act, stock_max;
 
@@ -63,15 +65,16 @@ BEGIN
             END IF;
 
             IF stock_act < stock_min THEN
-                INSERT INTO PRODUCTOS_REPOSICIÓN (id_producto, nombre, stock, stock faltante)
+                INSERT INTO PRODUCTOS_REPOSICIÓN (id_producto, nombre, stock, stock_faltante)
                 VALUES (
                     id_act,
                     nombre_act,
                     stock_act,
-                    stock_min - stock_act
+                    stock_max - stock_act
                 );
         END LOOP;
 
+        CLOSE recorrer;
     COMMIT;
 END;
 ```
